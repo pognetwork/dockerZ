@@ -1,11 +1,17 @@
-#pip freeze > requirements.txt
 certifi==2021.10.8
 charset-normalizer==2.0.12
+click==8.0.3
+colorama==0.4.4
 docker==4.2.2
+Flask==2.0.3
 idna==3.3
+itsdangerous==2.0.1
+Jinja2==3.0.3
+MarkupSafe==2.0.1
 pypiwin32==223
 pywin32==303
 requests==2.27.1
 six==1.16.0
 urllib3==1.26.8
 websocket-client==1.2.3
+Werkzeug==2.0.3
