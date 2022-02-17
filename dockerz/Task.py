@@ -5,16 +5,25 @@ class Task:
     self.image = image
     self.tag = tag
     self.commit = commit
+    self.nodes = []
 
-  def run(self):
-    createContainer(self.image)
+  def run(self, networkName, NrOfNodes):
+    print("running task")
+    self.client = docker.from_env()
+    self.createContainers(NrOfNodes)
+    self.createNetwork(networkName)
 
-def createContainer(image):
-  client = docker.from_env()
-  network = client.networks.create("pog.network", driver="bridge")
-  container1 = client.containers.run(image, name="node1", detach=True)
-  container2 = client.containers.run(image, name="node2", detach=True)
-  network.connect(container1)
-  network.connect(container2)
+  def createContainer(self, nodeName):
+    print("creating container")
+    return self.client.containers.run(self.image, name=nodeName, detach=True)
+    
+  def createNetwork(self, name="pog.network"):
+    print("creating network")
+    network = self.client.networks.create(name, driver="bridge")
+    for node in self.nodes:
+      network.connect(node)
 
-
+  def createContainers(self, number):
+    for i in range(1, number):
+      nodeName = "DockerZ_Node_" + str(i)
+      self.nodes.append(self.createContainer(nodeName))
