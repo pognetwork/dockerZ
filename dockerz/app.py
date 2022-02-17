@@ -1,7 +1,6 @@
-import os, threading
+import os, threading, docker, task
+from socket import timeout
 from flask import Flask, request
-from task import Task
-from multiprocessing import Process
 from queue import Queue
 
 DOCKERZ_KEY = os.environ.get("DOCKERZ_KEY", "someDefaultKey")
@@ -18,25 +17,31 @@ def update(key):
     if key != DOCKERZ_KEY: return "invalid key", 401
     print("route reached")
 
-    image = request.form.get("image", default="ghcr.io/pognetwork/champ")
-    tag = request.form.get("tag", default="canary")
-    commit = request.form.get("commit")
+    image = request.form.get("image", default="ghcr.io/pognetwork/champ", type=str)
+    tag = request.form.get("tag", default="canary", type=str)
+    commit = request.form.get("commit", type=str)
 
-    tasks.put(Task(image, tag, commit))
+    tasks.put(task.Task(image, tag, commit))
     return str(tasks.qsize())
 
-def loop():
+def worker():
+    client = docker.from_env()
+    for container in client.containers.list(True):
+        if container.name.startswith(task.NODE_NAME_PREFIX):
+            print(f"Removing Containers {container.name}...")
+            container.stop(timeout=1)
+
     while True:
         currentTask = tasks.get()
-        currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES)
+        currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
         # run the task
         # 1. start 2 or more containers based on the canary image
         # 2. run function on container 1 and test if it worked on container 2
-        
+
         # tasks.task_done()
 
 def main():
-    threading.Thread(target=loop, daemon=True).start()
+    threading.Thread(target=worker, daemon=True).start()
 
     http.run(threaded=False)
 
