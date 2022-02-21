@@ -29,7 +29,7 @@ class Task:
 
     def createNetwork(self, name="pog.network"):
         print("creating network")
-        network = self.client.networks.create(name, driver="bridge")
+        network = self.client.networks.create(name, driver="bridge", check_duplicate=True)
         for node in self.nodes:
             network.connect(node)
 

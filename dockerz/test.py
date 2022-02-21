@@ -1,29 +1,35 @@
-import dockerz.task as task, requests, time
+from dockerz.task import Task
+import requests, time
 
 
-def run(task: task):
+def run(task: Task):
     results = {}
     print("running tests..")
-    allTests = [func for func in dir(Tests) if callable(getattr(Tests, func))]
-    for tests in allTests:
-        results[tests.__name__] = tests()
+    results["preparingTests"] = preparingTests(task)
+    for func in dir(Tests):
+        test = getattr(Tests, func)
+        if callable(test) and not func.startswith("__"):
+            results[func] = test(task)
 
     print("tests completed.")
+    return results
 
 
-def preparingTests(task: task):
+def preparingTests(task: Task):
     print("preparing tests..")
-    for node in task.Task.nodes:
+    for node in task.nodes:
+        response = None
         startTime = int(time.time())
-        while response.status_code != 200:
+        while not response or response.status_code != 200:
             url = f"http://{node.name}:50048"
+            print(url)
             response = requests.get(url)
             if startTime + 60 > int(time.time()):
                 return TestResult(False, f"could not start container: {node.name}")
             responses = parseResponse(response.text)
             if responses["grpc_health"] == "1":
                 break
-    TestResult(True, f"_")
+    TestResult(True, "")
 
 
 def parseResponse(text: str):
@@ -42,7 +48,8 @@ class TestResult:
 
 
 class Tests:
-    pass
+    def testTests(task):
+        return TestResult(True, "")
 
     # http endpoint port 50048
     # get text

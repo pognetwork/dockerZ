@@ -38,7 +38,13 @@ def worker():
         # 1. start 2 or more containers based on the canary image
         currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
         # 2. run function on container 1 and test if it worked on container 2 (Tests)
-        test.run(currentTask)
+        testResults = test.run(currentTask)
+        for key, value in testResults.items():
+            print(
+                f"{key}: {value.passed if 'Pass' else 'Failed - '}{value.passed if '' else value.context}"
+            )
+            # TestLatestblock: Passed
+            # TestSomeTest: Failed - Container could not start
         # 3. Cleanup (stop containers)
         currentTask.cleanup()
 
