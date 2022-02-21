@@ -1,5 +1,4 @@
-import os, threading, docker, task
-from socket import timeout
+import os, threading, docker, dockerz.task as task, dockerz.test as test
 from flask import Flask, request
 from queue import Queue
 
@@ -33,17 +32,14 @@ def worker():
 
     while True:
         currentTask = tasks.get()
-        currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
-        # run the task
         # 1. start 2 or more containers based on the canary image
-        # 2. run function on container 1 and test if it worked on container 2
-
-        # tasks.task_done()
+        currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
+        # 2. run function on container 1 and test if it worked on container 2 (Tests)
+        test.run(currentTask)
+        # 3. Cleanup (stop containers)
+        currentTask.cleanup()
 
 def main():
     threading.Thread(target=worker, daemon=True).start()
 
     http.run(threaded=False)
-
-if __name__ == '__main__':
-    main()

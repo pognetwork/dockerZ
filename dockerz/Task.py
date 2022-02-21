@@ -28,3 +28,8 @@ class Task:
     for i in range(0, number):
       nodeName = NODE_NAME_PREFIX + str(i)
       self.nodes.append(self.createContainer(nodeName))
+  
+  def cleanup(self):
+    print("cleaning up containers..")
+    for node in self.nodes:
+      node.stop(timeout=1)
