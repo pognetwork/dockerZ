@@ -11,9 +11,11 @@ currentTask = None
 
 http = Flask(__name__)
 
-@http.route('/update/<key>', methods=['POST'])
+
+@http.route("/update/<key>", methods=["POST"])
 def update(key):
-    if key != DOCKERZ_KEY: return "invalid key", 401
+    if key != DOCKERZ_KEY:
+        return "invalid key", 401
     print("route reached")
 
     image = request.form.get("image", default="ghcr.io/pognetwork/champ", type=str)
@@ -22,6 +24,7 @@ def update(key):
 
     tasks.put(task.Task(image, tag, commit))
     return str(tasks.qsize())
+
 
 def worker():
     client = docker.from_env()
@@ -38,6 +41,7 @@ def worker():
         test.run(currentTask)
         # 3. Cleanup (stop containers)
         currentTask.cleanup()
+
 
 def main():
     threading.Thread(target=worker, daemon=True).start()
