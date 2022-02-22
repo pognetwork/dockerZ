@@ -41,7 +41,7 @@ def worker():
         testResults = test.run(currentTask, DOCKERZ_NETWORK)
         for key, value in testResults.items():
             print(
-                f"{key}: {value.passed if 'Pass' else 'Failed - '}{value.passed if '' else value.context}"
+                f"{key}: {'Pass' if value.passed else 'Failed - '}{'' if value.passed else value.context}"
             )
             # TestLatestblock: Passed
             # TestSomeTest: Failed - Container could not start

@@ -22,17 +22,16 @@ def preparingTests(task: Task, networkName):
         startTime = int(time.time())
         while not response or response.status_code != 200:
             node.reload()
-            print(node.attrs)
             ip = node.attrs['NetworkSettings']['Networks'][networkName]['IPAddress']
             url = f"http://{ip}:50048"
             print(url)
             response = requests.get(url, timeout=60)
-            if startTime + 60 > int(time.time()):
+            if (startTime + 60) < int(time.time()):
                 return TestResult(False, f"could not start container: {node.name}")
             responses = parseResponse(response.text)
             if responses["grpc_health"] == "1":
                 break
-    TestResult(True, "")
+    return TestResult(True, "")
 
 
 def parseResponse(text: str):
