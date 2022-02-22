@@ -52,8 +52,3 @@ class TestResult:
 class Tests:
     def testTests(task):
         return TestResult(True, "")
-
-    # http endpoint port 50048
-    # get text
-    # split new line without #
-    # then split by space for hashmap
