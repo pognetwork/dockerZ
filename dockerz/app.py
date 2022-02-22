@@ -38,7 +38,7 @@ def worker():
         # 1. start 2 or more containers based on the canary image
         currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
         # 2. run function on container 1 and test if it worked on container 2 (Tests)
-        testResults = test.run(currentTask)
+        testResults = test.run(currentTask, DOCKERZ_NETWORK)
         for key, value in testResults.items():
             print(
                 f"{key}: {value.passed if 'Pass' else 'Failed - '}{value.passed if '' else value.context}"
@@ -52,4 +52,4 @@ def worker():
 def main():
     threading.Thread(target=worker, daemon=True).start()
 
-    http.run(threaded=False)
+    http.run(threaded=False,host="0.0.0.0")

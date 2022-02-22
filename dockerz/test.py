@@ -2,10 +2,10 @@ from dockerz.task import Task
 import requests, time
 
 
-def run(task: Task):
+def run(task: Task, networkName):
     results = {}
     print("running tests..")
-    results["preparingTests"] = preparingTests(task)
+    results["preparingTests"] = preparingTests(task, networkName)
     for func in dir(Tests):
         test = getattr(Tests, func)
         if callable(test) and not func.startswith("__"):
@@ -15,15 +15,18 @@ def run(task: Task):
     return results
 
 
-def preparingTests(task: Task):
+def preparingTests(task: Task, networkName):
     print("preparing tests..")
     for node in task.nodes:
         response = None
         startTime = int(time.time())
         while not response or response.status_code != 200:
-            url = f"http://{node.name}:50048"
+            node.reload()
+            print(node.attrs)
+            ip = node.attrs['NetworkSettings']['Networks'][networkName]['IPAddress']
+            url = f"http://{ip}:50048"
             print(url)
-            response = requests.get(url)
+            response = requests.get(url, timeout=60)
             if startTime + 60 > int(time.time()):
                 return TestResult(False, f"could not start container: {node.name}")
             responses = parseResponse(response.text)

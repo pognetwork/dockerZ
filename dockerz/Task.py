@@ -1,4 +1,6 @@
-NODE_NAME_PREFIX = "DockerZ_Node_"
+import time
+
+NODE_NAME_PREFIX = "DockerZNode"
 
 
 class Task:
@@ -12,10 +14,10 @@ class Task:
     def run(self, networkName, NrOfNodes, client):
         self.client = client
         print(f"running task. Nr of nodes {NrOfNodes}")
-        self.createContainers(NrOfNodes)
         self.createNetwork(networkName)
+        self.createContainers(NrOfNodes, networkName)
 
-    def createContainer(self, nodeName):
+    def createContainer(self, nodeName, networkName):
         print(f"creating container {self.tagImage}")
         self.client.images.pull(self.tagImage)
         return self.client.containers.run(
@@ -25,18 +27,19 @@ class Task:
             detach=True,
             auto_remove=True,
             remove=True,
+            network=networkName
         )
 
     def createNetwork(self, name="pog.network"):
         print("creating network")
-        network = self.client.networks.create(name, driver="bridge", check_duplicate=True)
-        for node in self.nodes:
-            network.connect(node)
+        matches = self.client.networks.list([name])
+        if not len(matches):
+            self.client.networks.create(name, driver="bridge", check_duplicate=True)
 
-    def createContainers(self, number):
+    def createContainers(self, number, networkName):
         for i in range(0, number):
             nodeName = NODE_NAME_PREFIX + str(i)
-            self.nodes.append(self.createContainer(nodeName))
+            self.nodes.append(self.createContainer(nodeName, networkName))
 
     def cleanup(self):
         print("cleaning up containers..")
