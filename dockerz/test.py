@@ -51,4 +51,4 @@ class TestResult:
 
 class Tests:
     def testTests(task):
-        return TestResult(True, "")
+        return TestResult(True, "Debug Test testing failed")

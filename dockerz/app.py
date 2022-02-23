@@ -1,10 +1,14 @@
-import os, threading, docker, dockerz.task as task, dockerz.test as test
+import os, threading, docker, dockerz.task as task, dockerz.test as test, dockerz.webhook as webhook
 from flask import Flask, request
 from queue import Queue
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DOCKERZ_KEY = os.environ.get("DOCKERZ_KEY", "someDefaultKey")
 DOCKERZ_NETWORK = os.environ.get("DOCKERZ_NAME", "pog.network")
 DOCKERZ_NROFNODES = int(os.environ.get("DOCKERZ_NROFNODES", "2"))
+DOCKERZ_WEBHOOK = os.environ.get("DOCKERZ_WEBHOOK")
 
 tasks = Queue()
 currentTask = None
@@ -35,21 +39,16 @@ def worker():
 
     while True:
         currentTask = tasks.get()
-        # 1. start 2 or more containers based on the canary image
+        # start 2 or more containers based on the canary image
         currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
-        # 2. run function on container 1 and test if it worked on container 2 (Tests)
+        # run function on container 1 and test if it worked on container 2 (Tests)
         testResults = test.run(currentTask, DOCKERZ_NETWORK)
-        for key, value in testResults.items():
-            print(
-                f"{key}: {'Pass' if value.passed else 'Failed - '}{'' if value.passed else value.context}"
-            )
-            # TestLatestblock: Passed
-            # TestSomeTest: Failed - Container could not start
-        # 3. Cleanup (stop containers)
+        webhook.run(testResults, DOCKERZ_WEBHOOK)
+        # Cleanup (stop containers)
         currentTask.cleanup()
 
-
 def main():
+
     threading.Thread(target=worker, daemon=True).start()
 
     http.run(threaded=False,host="0.0.0.0")

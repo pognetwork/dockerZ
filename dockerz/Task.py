@@ -1,5 +1,3 @@
-import time
-
 NODE_NAME_PREFIX = "DockerZNode"
 
 
@@ -30,7 +28,7 @@ class Task:
             network=networkName
         )
 
-    def createNetwork(self, name="pog.network"):
+    def createNetwork(self, name):
         print("creating network")
         matches = self.client.networks.list([name])
         if not len(matches):
