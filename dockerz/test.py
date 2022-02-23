@@ -5,7 +5,7 @@ import requests, time
 def run(task: Task, networkName):
     results = {}
     print("running tests..")
-    results["preparingTests"] = preparingTests(task, networkName)
+    results["preparingTests"] = PreparingTests(task, networkName)
     for func in dir(Tests):
         test = getattr(Tests, func)
         if callable(test) and not func.startswith("__"):
@@ -15,7 +15,7 @@ def run(task: Task, networkName):
     return results
 
 
-def preparingTests(task: Task, networkName):
+def PreparingTests(task: Task, networkName):
     print("preparing tests..")
     for node in task.nodes:
         response = None
@@ -50,5 +50,5 @@ class TestResult:
 
 
 class Tests:
-    def testTests(task):
+    def TestTests(task):
         return TestResult(True, "Debug Test testing failed")

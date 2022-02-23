@@ -43,7 +43,7 @@ def worker():
         currentTask.run(DOCKERZ_NETWORK, DOCKERZ_NROFNODES, client)
         # run function on container 1 and test if it worked on container 2 (Tests)
         testResults = test.run(currentTask, DOCKERZ_NETWORK)
-        webhook.run(testResults, DOCKERZ_WEBHOOK)
+        webhook.run(testResults, DOCKERZ_WEBHOOK, currentTask.commit)
         # Cleanup (stop containers)
         currentTask.cleanup()
 
