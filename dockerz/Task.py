@@ -25,7 +25,7 @@ class Task:
             detach=True,
             auto_remove=True,
             remove=True,
-            network=networkName
+            network=networkName,
         )
 
     def createNetwork(self, name):

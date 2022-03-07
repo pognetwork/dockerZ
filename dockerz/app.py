@@ -1,9 +1,12 @@
-import os, threading, docker, dockerz.task as task, dockerz.test as test, dockerz.webhook as webhook
+import os, threading, docker
+
+import dockerz.test as test
+import dockerz.webhook as webhook
+
+from .Task import Task, NODE_NAME_PREFIX
 from flask import Flask, request
 from queue import Queue
-from dotenv import load_dotenv
 
-load_dotenv()
 
 DOCKERZ_KEY = os.environ.get("DOCKERZ_KEY", "someDefaultKey")
 DOCKERZ_NETWORK = os.environ.get("DOCKERZ_NAME", "pog.network")
@@ -26,14 +29,14 @@ def update(key):
     tag = request.form.get("tag", default="canary", type=str)
     commit = request.form.get("commit", type=str)
 
-    tasks.put(task.Task(image, tag, commit))
+    tasks.put(Task(image, tag, commit))
     return str(tasks.qsize())
 
 
 def worker():
     client = docker.from_env()
     for container in client.containers.list(True):
-        if container.name.startswith(task.NODE_NAME_PREFIX):
+        if container.name.startswith(NODE_NAME_PREFIX):
             print(f"Removing Containers {container.name}...")
             container.stop(timeout=1)
 
@@ -47,8 +50,9 @@ def worker():
         # Cleanup (stop containers)
         currentTask.cleanup()
 
+
 def main():
 
     threading.Thread(target=worker, daemon=True).start()
 
-    http.run(threaded=False,host="0.0.0.0")
+    http.run(threaded=False, host="0.0.0.0")

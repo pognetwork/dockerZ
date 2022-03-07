@@ -1,4 +1,4 @@
-from dockerz.task import Task
+from .Task import Task
 import requests, time
 
 
@@ -22,7 +22,7 @@ def PreparingTests(task: Task, networkName):
         startTime = int(time.time())
         while not response or response.status_code != 200:
             node.reload()
-            ip = node.attrs['NetworkSettings']['Networks'][networkName]['IPAddress']
+            ip = node.attrs["NetworkSettings"]["Networks"][networkName]["IPAddress"]
             url = f"http://{ip}:50048"
             print(url)
             response = requests.get(url, timeout=60)
