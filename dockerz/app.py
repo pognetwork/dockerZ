@@ -25,9 +25,9 @@ def update(key):
         return "invalid key", 401
     print("route reached")
 
-    image = request.form.get("image", default="ghcr.io/pognetwork/champ", type=str)
-    tag = request.form.get("tag", default="canary", type=str)
-    commit = request.form.get("commit", type=str)
+    image = request.json["image"]
+    tag = request.json["tag"]
+    commit = request.json["commit"]
 
     tasks.put(Task(image, tag, commit))
     return str(tasks.qsize())
