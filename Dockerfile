@@ -18,5 +18,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # copy code into the image
 COPY . .
 
-# run the code, brought to you by henrygressmann.de:
+# run the code
 CMD [ "python3", "./app.py" ]
