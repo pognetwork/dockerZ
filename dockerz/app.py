@@ -8,7 +8,7 @@ from flask import Flask, request
 from queue import Queue
 
 
-DOCKERZ_KEY = os.environ.get("DOCKERZ_KEY", "someDefaultKey")
+DOCKERZ_KEY = os.environ.get("DOCKERZ_KEY")
 DOCKERZ_NETWORK = os.environ.get("DOCKERZ_NAME", "pog.network")
 DOCKERZ_NROFNODES = int(os.environ.get("DOCKERZ_NROFNODES", "2"))
 DOCKERZ_WEBHOOK = os.environ.get("DOCKERZ_WEBHOOK")
