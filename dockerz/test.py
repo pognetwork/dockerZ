@@ -1,3 +1,7 @@
+from sys import stdout
+import requests
+
+from requests.adapters import HTTPAdapter, Retry
 from .Task import Task
 import requests, time
 
@@ -17,20 +21,43 @@ def run(task: Task, networkName):
 
 def PreparingTests(task: Task, networkName):
     print("preparing tests..")
+    ips = []
     for node in task.nodes:
         response = None
         startTime = int(time.time())
+        node.start()
+        node.reload()
+        ip = node.attrs["NetworkSettings"]["Networks"][networkName]["IPAddress"]
+        url = f"http://{ip}:50048"
+        print(url)
+        _, output = node.exec_run("/usr/local/bin/champ-node --feat-metrics", detach=True, tty=True, stdout=True, stream=True, environment = {
+            "CHAMP_INITIAL_PEERS": ",".join(ips), 
+            "CHAMP_PRIMARY_WALLET_PASSWORD": "pogpogpogpogpog",
+            "CHAMP_GENERATE_PRIMARY_WALLET": "true",
+            "CHAMP_GENERATE_JWT_KEYS": "true",
+        })
+        for line in output:
+            print(line)
+        time.sleep(5)
         while not response or response.status_code != 200:
-            node.reload()
-            ip = node.attrs["NetworkSettings"]["Networks"][networkName]["IPAddress"]
-            url = f"http://{ip}:50048"
-            print(url)
-            response = requests.get(url, timeout=60)
+            print("pog1")
+            s = requests.Session()
+            retries = Retry(total=7,
+                    backoff_factor=0.1,
+                    status_forcelist=[ 500, 502, 503, 504 ])
+            print("pog2")
+            s.mount('http://', HTTPAdapter(max_retries=retries))
+            response = s.get(url)
+            print("pog2.5")
             if (startTime + 60) < int(time.time()):
+                print("unpog")
                 return TestResult(False, f"could not start container: {node.name}")
             responses = parseResponse(response.text)
             if responses["grpc_health"] == "1":
-                break
+                break  
+            print("pog3")
+
+    print("pogchamp")    
     return TestResult(True, "")
 
 
@@ -52,3 +79,9 @@ class TestResult:
 class Tests:
     def TestTests(task):
         return TestResult(True, "Debug Test testing failed")
+    
+    def TestPing(task):
+        #for node in task.nodes:
+            # send ping
+            # check response
+        return TestResult(True, "")

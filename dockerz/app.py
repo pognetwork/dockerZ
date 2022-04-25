@@ -36,9 +36,11 @@ def update(key):
 def worker():
     client = docker.from_env()
     for container in client.containers.list(True):
+        print(client.containers.list(True))
         if container.name.startswith(NODE_NAME_PREFIX):
             print(f"Removing Containers {container.name}...")
             container.stop(timeout=1)
+            container.remove()
 
     while True:
         currentTask = tasks.get()
@@ -52,7 +54,5 @@ def worker():
 
 
 def main():
-
     threading.Thread(target=worker, daemon=True).start()
-
     http.run(threaded=False, host="0.0.0.0")

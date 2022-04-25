@@ -16,15 +16,15 @@ class Task:
         self.createContainers(NrOfNodes, networkName)
 
     def createContainer(self, nodeName, networkName):
-        print(f"creating container {self.tagImage}")
+        print(f"creating container {nodeName}: {self.tagImage}")
         self.client.images.pull(self.tagImage)
-        return self.client.containers.run(
+        return self.client.containers.create(
             self.tagImage,
-            command="--feat-metrics",
+            entrypoint="/bin/sleep",
+            command="5000" ,
             name=nodeName,
+            ports={'50048/tcp': 50048},
             detach=True,
-            auto_remove=True,
-            remove=True,
             network=networkName,
         )
 

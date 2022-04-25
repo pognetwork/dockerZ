@@ -7,4 +7,4 @@ docker run -it --rm\
     -p 5000:5000\
     -w //usr/src/dockerz\
     python:3.10-alpine\
-    sh -c "pip install -r requirements.txt && python app.py"
+    sh -c "apk add git && pip install -r requirements.txt && python app.py"
