@@ -36,7 +36,6 @@ def update(key):
 def worker():
     client = docker.from_env()
     for container in client.containers.list(True):
-        print(client.containers.list(True))
         if container.name.startswith(NODE_NAME_PREFIX):
             print(f"Removing Containers {container.name}...")
             container.stop(timeout=1)

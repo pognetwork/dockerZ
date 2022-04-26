@@ -1,3 +1,6 @@
+import tty
+
+
 NODE_NAME_PREFIX = "DockerZNode"
 
 
@@ -18,12 +21,18 @@ class Task:
     def createContainer(self, nodeName, networkName):
         print(f"creating container {nodeName}: {self.tagImage}")
         self.client.images.pull(self.tagImage)
-        return self.client.containers.create(
+        return self.client.containers.run(
             self.tagImage,
-            entrypoint="/bin/sleep",
-            command="5000" ,
+            entrypoint="/bin/sh",
+            command='-c "echo 1 && /usr/local/bin/champ-node --loglevel=debug --feat-metrics"',
+            tty=True,
             name=nodeName,
-            ports={'50048/tcp': 50048},
+            environment={
+                "CHAMP_INITIAL_PEERS": ",".join(""),
+                "CHAMP_PRIMARY_WALLET_PASSWORD": "pogpogpogpogpog",
+                "CHAMP_GENERATE_PRIMARY_WALLET": "true",
+                "CHAMP_GENERATE_JWT_KEYS": "true",
+            },
             detach=True,
             network=networkName,
         )

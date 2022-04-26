@@ -7,4 +7,4 @@ docker run -it --rm\
     -p 5000:5000\
     -w /usr/src/dockerz/\
     python:3.10-alpine\
-    python app.py
+    sh -c "./env/bin/python app.py"
