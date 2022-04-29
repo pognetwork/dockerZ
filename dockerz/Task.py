@@ -18,7 +18,7 @@ class Task:
         self.createNetwork(networkName)
         self.createContainers(NrOfNodes, networkName)
 
-    def createContainer(self, nodeName, networkName):
+    def createContainer(self, nodeName, allNodeIps, networkName):
         print(f"creating container {nodeName}: {self.tagImage}")
         self.client.images.pull(self.tagImage)
         return self.client.containers.run(
@@ -28,7 +28,7 @@ class Task:
             tty=True,
             name=nodeName,
             environment={
-                "CHAMP_INITIAL_PEERS": ",".join(""),
+                "CHAMP_INITIAL_PEERS": ",".join(allNodeIps),
                 "CHAMP_PRIMARY_WALLET_PASSWORD": "pogpogpogpogpog",
                 "CHAMP_GENERATE_PRIMARY_WALLET": "true",
                 "CHAMP_GENERATE_JWT_KEYS": "true",
@@ -44,9 +44,12 @@ class Task:
             self.client.networks.create(name, driver="bridge", check_duplicate=True)
 
     def createContainers(self, number, networkName):
+        allNodeIps = []
+        for n in range(0, number):
+            allNodeIps.append(f"/ip4/172.17.0.{n}/tcp/50052")
         for i in range(0, number):
-            nodeName = NODE_NAME_PREFIX + str(i)
-            self.nodes.append(self.createContainer(nodeName, networkName))
+            name = NODE_NAME_PREFIX + str(i)
+            self.nodes.append(self.createContainer(name, allNodeIps, networkName))
 
     def cleanup(self):
         print("cleaning up containers..")
