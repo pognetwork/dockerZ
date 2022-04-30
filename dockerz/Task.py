@@ -55,3 +55,4 @@ class Task:
         print("cleaning up containers..")
         for node in self.nodes:
             node.stop(timeout=1)
+            node.remove()

@@ -75,7 +75,7 @@ class Tests:
             response = s.get(url)
             responses = parseResponse(response.text)
             peers = responses["connected_peers"]
-            total_nodes = task.nodes.len()
-            if peers != total_nodes:
-                return TestResult(False, f"Only {peers} of {total_nodes} nodes connected.")
-        return TestResult(True, "")
+            total_nodes_other_nodes = task.nodes.len() - 1
+            if peers == total_nodes_other_nodes:
+                return TestResult(True, )
+        return TestResult(False, f"Only {peers} of {total_nodes_other_nodes} nodes connected.")
