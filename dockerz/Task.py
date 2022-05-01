@@ -46,7 +46,8 @@ class Task:
     def createContainers(self, number, networkName):
         allNodeIps = []
         for n in range(0, number):
-            allNodeIps.append(f"/ip4/172.17.0.{n}/tcp/50052")
+            name = NODE_NAME_PREFIX + str(n)
+            allNodeIps.append(f"/dns4/{name}/tcp/50052")
         for i in range(0, number):
             name = NODE_NAME_PREFIX + str(i)
             self.nodes.append(self.createContainer(name, allNodeIps, networkName))

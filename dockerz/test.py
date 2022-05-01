@@ -40,7 +40,7 @@ def PreparingTests(task: Task, networkName):
             responses = parseResponse(response.text)
             if responses["grpc_health"] == "1":
                 break
-
+    print("Containers started.")
     return TestResult(True, "")
 
 
@@ -67,8 +67,8 @@ class Tests:
         print(networkName)
         for node in task.nodes:
             node.reload()
-            ip = node.attrs["NetworkSettings"]["Networks"][networkName]["IPAddress"]
-            url = f"http://{ip}:50048"
+            url = f"http://{node.name}:50048"
+            print(node.name)
             # check if metrics has pings
             s = requests.Session()
             s.mount("http://", HTTPAdapter())
