@@ -25,8 +25,7 @@ def PreparingTests(task: Task, networkName):
         response = None
         startTime = int(time.time())
         node.reload()
-        ip = node.attrs["NetworkSettings"]["Networks"][networkName]["IPAddress"]
-        url = f"http://{ip}:50048"
+        url = f"http://{node.name}:50048"
         time.sleep(5)
         while not response or response.status_code != 200:
             s = requests.Session()
