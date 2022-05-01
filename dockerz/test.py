@@ -13,7 +13,7 @@ def run(task: Task, networkName):
     for func in dir(Tests):
         test = getattr(Tests, func)
         if callable(test) and not func.startswith("__"):
-            results[func] = test(task, networkName)
+            results[func] = test(task)
 
     print("tests completed.")
     return results
@@ -63,19 +63,19 @@ class Tests:
     def TestTests(task):
         return TestResult(True, "Debug Test testing failed")
 
-    def TestPing(task: Task, networkName):
-        print(networkName)
+    def TestPing(task: Task):
+        time.sleep(5)
         for node in task.nodes:
             node.reload()
             url = f"http://{node.name}:50048"
-            print(node.name)
             # check if metrics has pings
             s = requests.Session()
             s.mount("http://", HTTPAdapter())
             response = s.get(url)
             responses = parseResponse(response.text)
-            peers = responses["connected_peers"]
-            total_nodes_other_nodes = task.nodes.len() - 1
-            if peers == total_nodes_other_nodes:
-                return TestResult(True, )
+            peers = responses["peers_connected"]
+            total_nodes_other_nodes = len(task.nodes) - 1
+            print(f"total_nodes: {len(task.nodes)}")
+            if int(peers) == total_nodes_other_nodes:
+                return TestResult(True, "")
         return TestResult(False, f"Only {peers} of {total_nodes_other_nodes} nodes connected.")
