@@ -9,6 +9,7 @@
 
 ```bash
 $ python -m venv env
-$ source env/bin/activate
+$ source env/bin/activate [win: $ source env/Scripts/activate]
 $ pip install -r requirements.txt
+$ ./dev.sh
 ```
